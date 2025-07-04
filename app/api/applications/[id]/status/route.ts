@@ -4,15 +4,15 @@ import { authOptions } from "../../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
 import Application from "@/models/Application";
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.userType !== 'college') {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const url = new URL(request.url);
+    const id = url.pathname.split('/').pop();
 
     const { status } = await request.json();
     if (!['accepted', 'rejected'].includes(status)) {
@@ -21,7 +21,7 @@ export async function PUT(
 
     await connectDB();
     const application = await Application.findOneAndUpdate(
-      { _id: params.id, eventOwner: session.user.id },
+      { _id: id, eventOwner: session.user.id },
       { status, updatedAt: new Date() },
       { new: true }
     );
