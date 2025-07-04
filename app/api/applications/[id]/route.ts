@@ -7,8 +7,9 @@ import Application from "@/models/Application";
 // ✅ Explicitly type the context parameter
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
+  const { params } = context;
   try {
     const session = await getServerSession({ req, ...authOptions });
 
