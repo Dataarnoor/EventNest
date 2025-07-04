@@ -7,9 +7,9 @@ import Application from "@/models/Application";
 // ✅ Explicitly type the context parameter
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
-  const { id } = await params;
+  const id = context?.params?.id;
   try {
     const session = await getServerSession({ req: request, ...authOptions });
 
