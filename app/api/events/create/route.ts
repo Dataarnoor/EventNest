@@ -4,6 +4,15 @@ import Event from "@/models/Event";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import mongoose from "mongoose";
+import formidable from "formidable";
+import fs from "fs";
+import path from "path";
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export async function POST(request: Request) {
   try {
@@ -13,14 +22,32 @@ export async function POST(request: Request) {
     }
 
     await connectDB();
-    const body = await request.json();
-    
-    const eventData = {
-      ...body,
+
+    // Parse form data
+    const form = formidable({ multiples: false, uploadDir: "./public/uploads", keepExtensions: true });
+    const [fields, files] = await new Promise<[any, any]>((resolve, reject) => {
+      form.parse(request as any, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve([fields, files]);
+      });
+    });
+
+    // Prepare event data
+    const eventData: any = {
+      ...fields,
       college: new mongoose.Types.ObjectId(session.user.id),
       organizerEmail: session.user.email,
-      isActive: true
+      isActive: true,
     };
+
+    // Handle brochure file
+    if (files.brochurePdf) {
+      const brochureFile = Array.isArray(files.brochurePdf) ? files.brochurePdf[0] : files.brochurePdf;
+      eventData.brochurePdf = {
+        url: `/uploads/${path.basename(brochureFile.filepath)}`,
+        filename: brochureFile.originalFilename,
+      };
+    }
 
     const event = await Event.create(eventData);
     return NextResponse.json({ message: "Event created successfully", event }, { status: 201 });
