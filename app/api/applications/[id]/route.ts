@@ -5,11 +5,10 @@ import connectDB from "@/lib/db";
 import Application from "@/models/Application";
 
 // ✅ Explicitly type the context parameter
-export async function DELETE(
-  request: Request,
-  context: any
-) {
-  const id = context?.params?.id;
+export async function DELETE(request: Request) {
+  // Parse the id from the URL
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
   try {
     const session = await getServerSession({ req: request, ...authOptions });
 
