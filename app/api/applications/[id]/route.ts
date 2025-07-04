@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
 import Application from "@/models/Application";
+
 import type { NextRequest } from "next/server";
 
 export async function DELETE(
@@ -10,9 +11,9 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession({ req, ...authOptions });
+    const session = await getServerSession(authOptions);
 
-    if (!session || session.user.userType !== 'sponsor') {
+    if (!session || session.user.userType !== "sponsor") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -21,18 +22,19 @@ export async function DELETE(
     const application = await Application.findOneAndDelete({
       _id: context.params.id,
       sponsor: session.user.id,
-      status: 'pending'
+      status: "pending",
     });
 
     if (!application) {
-      return NextResponse.json({
-        error: "Application not found or cannot be deleted"
-      }, { status: 404 });
+      return NextResponse.json(
+        { error: "Application not found or cannot be deleted" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Application deleted successfully"
+      message: "Application deleted successfully",
     });
   } catch (error) {
     console.error("Delete application error:", error);
