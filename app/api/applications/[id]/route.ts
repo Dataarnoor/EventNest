@@ -1,16 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
 import Application from "@/models/Application";
-import type { NextRequest } from "next/server";
 
-export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+// ✅ Define the type of context explicitly
+type Context = {
+  params: {
+    id: string;
+  };
+};
+
+export async function DELETE(req: NextRequest, { params }: Context) {
   try {
-    // ✅ Pass `req` to getServerSession in App Router
     const session = await getServerSession({ req, ...authOptions });
 
     if (!session || session.user.userType !== "sponsor") {
@@ -20,7 +22,7 @@ export async function DELETE(
     await connectDB();
 
     const application = await Application.findOneAndDelete({
-      _id: context.params.id,
+      _id: params.id,
       sponsor: session.user.id,
       status: "pending",
     });
