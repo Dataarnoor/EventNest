@@ -8,11 +8,9 @@ import formidable from "formidable";
 import fs from "fs";
 import path from "path";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Use the new App Router convention for file uploads
+export const dynamic = "force-dynamic"; // Ensures this route is always dynamic
+export const maxSize = 16 * 1024 * 1024; // Optional: set max upload size (16MB here)
 
 export async function POST(request: Request) {
   try {
@@ -55,5 +53,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Error creating event:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
   }
 }
