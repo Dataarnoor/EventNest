@@ -4,7 +4,14 @@ import Link from "next/link";
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center relative">
+      {/* Home button top left */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 px-4 py-2 rounded-md border border-green-400 text-green-400 hover:bg-green-400/10 font-semibold transition"
+      >
+        Home
+      </Link>
       <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Create an Account</h1>

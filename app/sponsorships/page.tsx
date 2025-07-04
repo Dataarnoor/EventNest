@@ -593,13 +593,22 @@ export default function SponsorshipsPage() {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 mt-auto">
                   {!session ? (
-                    <Button
-                      className="bg-green-400 hover:bg-green-500 text-black font-semibold flex-1"
-                      onClick={() => router.push('/signup')}
-                    >
-                      Apply for Sponsorship
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
+                    <>
+                      <Button
+                        className="bg-green-400 hover:bg-green-500 text-black font-semibold flex-1"
+                        onClick={() => router.push('/signup')}
+                      >
+                        Apply for Sponsorship
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-gray-600 text-green-400 hover:bg-gray-800 flex-1"
+                        onClick={() => router.push('/')}
+                      >
+                        Home
+                      </Button>
+                    </>
                   ) : session.user?.userType === 'sponsor' ? (
                     <Button
                       className="bg-green-400 hover:bg-green-500 text-black font-semibold flex-1"
