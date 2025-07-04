@@ -10,7 +10,6 @@ import path from "path";
 
 // Use the new App Router convention for file uploads
 export const dynamic = "force-dynamic"; // Ensures this route is always dynamic
-export const maxSize = 16 * 1024 * 1024; // Optional: set max upload size (16MB here)
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +23,7 @@ export async function POST(request: Request) {
     // Parse form data
     const form = formidable({ multiples: false, uploadDir: "./public/uploads", keepExtensions: true });
     const [fields, files] = await new Promise<[any, any]>((resolve, reject) => {
-      form.parse(request as any, (err, fields, files) => {
+      form.parse(request as any, (err: any, fields: any, files: any) => {
         if (err) reject(err);
         else resolve([fields, files]);
       });
@@ -55,3 +54,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
