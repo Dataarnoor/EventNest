@@ -4,14 +4,11 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
 import Application from "@/models/Application";
 
-// ✅ Define the type of context explicitly
-type Context = {
-  params: {
-    id: string;
-  };
-};
-
-export async function DELETE(req: NextRequest, { params }: Context) {
+// ✅ Explicitly type the context parameter
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const session = await getServerSession({ req, ...authOptions });
 
