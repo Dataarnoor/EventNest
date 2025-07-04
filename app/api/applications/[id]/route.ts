@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
@@ -6,12 +6,12 @@ import Application from "@/models/Application";
 
 // ✅ Explicitly type the context parameter
 export async function DELETE(
-  req: NextRequest,
+  request: Request,
   context: { params: { id: string } }
 ) {
   const { params } = context;
   try {
-    const session = await getServerSession({ req, ...authOptions });
+    const session = await getServerSession({ req: request, ...authOptions });
 
     if (!session || session.user.userType !== "sponsor") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
