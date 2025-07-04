@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import connectDB from "@/lib/db";
 import Application from "@/models/Application";
-
 import type { NextRequest } from "next/server";
 
 export async function DELETE(
@@ -11,7 +10,8 @@ export async function DELETE(
   context: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    // ✅ Pass `req` to getServerSession in App Router
+    const session = await getServerSession({ req, ...authOptions });
 
     if (!session || session.user.userType !== "sponsor") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
