@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import Event from "@/models/Event";
 import mongoose from "mongoose";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+function extractIdFromRequest(request: Request) {
+  // /api/events/[id] => get id from the end of the path
+  // @ts-ignore
+  const pathname = request.nextUrl?.pathname || "";
+  return pathname.split("/").pop();
+}
+
+export async function GET(request: Request) {
   try {
     await connectDB();
-    const event = await Event.findById(params.id);
+    const id = extractIdFromRequest(request);
+    const event = await Event.findById(id);
     
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
@@ -23,7 +28,7 @@ export async function GET(
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.userType !== 'college') {
@@ -32,7 +37,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 
     await connectDB();
 
-    const eventId = params.id;
+    const eventId = extractIdFromRequest(request);
     if (!eventId) {
       return NextResponse.json({ error: "Event ID is required" }, { status: 400 });
     }
@@ -59,10 +64,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || session.user.userType !== 'college') {
@@ -71,10 +73,11 @@ export async function PUT(
 
     await connectDB();
     const data = await request.json();
+    const id = extractIdFromRequest(request);
     
     const event = await Event.findOneAndUpdate(
       {
-        _id: params.id,
+        _id: id,
         college: new mongoose.Types.ObjectId(session.user.id)
       },
       { 
@@ -94,7 +97,6 @@ export async function PUT(
     return NextResponse.json({ success: true, event });
   } catch (error) {
     console.error("Update event error:", error);
-  return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
-}
-  return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
+  }
 }

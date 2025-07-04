@@ -4,7 +4,7 @@ import Event from "@/models/Event";
 import { getServerSession } from "next-auth";
 import mongoose from "mongoose";
 
-export async function GET(req) {
+export async function GET(req: Request) {
   try {
     await connectDB();
     const session = await getServerSession();

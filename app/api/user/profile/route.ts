@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
 import Event from '@/models/Event';
@@ -77,60 +77,4 @@ export async function PUT(request: Request) {
     
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
-}
-
-export async function GET_WISHLIST(req) {
-  // Get the user's wishlist events
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
-  await connectDB();
-  const user = await User.findOne({ email: session.user.email }).populate('wishlist');
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
-  }
-  return new Response(JSON.stringify({ wishlist: user.wishlist }), { status: 200 });
-}
-
-export async function POST_WISHLIST(req) {
-  // Add an event to the user's wishlist
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
-  const { eventId } = await req.json();
-  if (!eventId) {
-    return new Response(JSON.stringify({ error: 'Missing eventId' }), { status: 400 });
-  }
-  await connectDB();
-  const user = await User.findOne({ email: session.user.email });
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
-  }
-  if (!user.wishlist.includes(eventId)) {
-    user.wishlist.push(eventId);
-    await user.save();
-  }
-  return new Response(JSON.stringify({ success: true }), { status: 200 });
-}
-
-export async function DELETE_WISHLIST(req) {
-  // Remove an event from the user's wishlist
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-  }
-  const { eventId } = await req.json();
-  if (!eventId) {
-    return new Response(JSON.stringify({ error: 'Missing eventId' }), { status: 400 });
-  }
-  await connectDB();
-  const user = await User.findOne({ email: session.user.email });
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
-  }
-  user.wishlist = user.wishlist.filter((id) => id.toString() !== eventId);
-  await user.save();
-  return new Response(JSON.stringify({ success: true }), { status: 200 });
 }
